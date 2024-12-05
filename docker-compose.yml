@@ -1,0 +1,39 @@
+version: "3"
+
+services:
+    mysql-db:
+        image: mysql:5.7
+        container_name: mysql-db
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: secret_message
+        volumes:
+            - mysql_data:/var/lib/mysql
+        networks:
+            - app-network
+
+    backend:
+        build: .
+        container_name: backend
+        volumes:
+            - .:/var/www/html:cached
+        environment:
+            DB_CONNECTION: mysql
+            DB_HOST: mysql-db
+            DB_PORT: 3306
+            DB_DATABASE: secret_message
+            DB_USERNAME: root
+            DB_PASSWORD: root
+        depends_on:
+            - mysql-db
+        ports:
+            - "8001:80"
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge
+
+volumes:
+    mysql_data:
